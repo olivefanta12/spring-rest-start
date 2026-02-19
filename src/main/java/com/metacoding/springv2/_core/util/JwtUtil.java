@@ -1,9 +1,5 @@
 package com.metacoding.springv2._core.util;
 
-import java.util.Date;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.metacoding.springv2.user.User;
 
 public class JwtUtil {
