@@ -1,8 +1,12 @@
 package com.metacoding.springv2.user;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "user_tb")
-public class User {
+public class User implements UserDetails {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
@@ -29,7 +33,7 @@ public class User {
     private String password;
     @Column(length = 30, nullable = false)
     private String email;
-    private String roles; // 디폴트값은 USER
+    private String roles; // ?�폴?�값?� USER
 
     @CreationTimestamp
     private Timestamp createdAt;
@@ -47,6 +51,16 @@ public class User {
     public void update(String email, String password) {
         this.email = email;
         this.password = password;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Collection<GrantedAuthority> as = new ArrayList<>();
+        String[] roleList = roles.split(","); // USER (1), USER, ADMIN (2)
+        for (String role : roleList) {
+            as.add(() -> "ROLE_" + role); // DB에는 asd_ROLE이 붙어야한다
+        }
+        return as;
     }
 
 }
