@@ -7,6 +7,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.metacoding.springv2._core.filter.JwtAuthorizationFilter;
 import com.metacoding.springv2._core.util.RespFilter;
@@ -26,7 +29,8 @@ public class SecurityConfig {
         http.headers(headers -> headers
                 .frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-        http.cors(c -> c.disable()); // 시큐리티가 들고있는 cors 동작중지
+        // 1. CORS 설정
+        http.cors(cors -> cors.configurationSource(configurationSource()));
 
         http.exceptionHandling(ex -> ex
                 .authenticationEntryPoint( // 인증필터
@@ -54,5 +58,18 @@ public class SecurityConfig {
         http.addFilterBefore(new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    // CORS 설정
+    public CorsConfigurationSource configurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE (Javascript 요청 허용)
+        configuration.addAllowedOriginPattern("*"); // 모든 IP 주소 허용 (프론트 앤드 IP만 허용 react)
+        configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
+        configuration.addExposedHeader("Authorization");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
