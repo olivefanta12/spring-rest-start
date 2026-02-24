@@ -20,6 +20,10 @@ public class Board {
     private String title;
     @Column(length = 300, nullable = false)
     private String content;
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int likeCount;
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int dislikeCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -35,11 +39,21 @@ public class Board {
         this.content = content;
     }
 
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void increaseDislikeCount() {
+        this.dislikeCount++;
+    }
+
     @Builder
-    public Board(Integer id, String title, String content, User user, Timestamp createdAt) {
+    public Board(Integer id, String title, String content, int likeCount, int dislikeCount, User user, Timestamp createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.likeCount = likeCount;
+        this.dislikeCount = dislikeCount;
         this.user = user;
         this.createdAt = createdAt;
     }

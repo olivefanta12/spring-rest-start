@@ -1,0 +1,673 @@
+# agent1 작업 이력
+
+## 작업 순서 1
+- 작업 일시: 2026-02-23
+- 대상 task: `.gem/task1.md` 7번 `게시글 삭제하기 기능 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/board/BoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardController.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - API 삭제 기능 추가: `DELETE /api/boards/{id}`
+  - 화면 삭제 기능 추가: `POST /boards/{id}/delete` 후 목록 리다이렉트
+  - 서비스 삭제 로직 추가 및 게시글 미존재 시 404 예외 처리
+  - 상세 화면에 삭제 버튼 추가
+  - task 7번 체크 완료
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트: `GET /boards/1`(200) -> `POST /boards/1/delete`(302) -> `GET /boards/1`(404)
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 2
+- 작업 일시: 2026-02-23
+- 대상 task: `.gem/task1.md` 8번 `게시글에 댓글 기능 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/reply/ReplyRepository.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyRequest.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyResponse.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyService.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyController.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardRepository.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardDetailDTO.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 댓글 저장용 `ReplyRepository`를 `JpaRepository` 기반으로 구현했다.
+  - 댓글 요청/응답 DTO를 추가했다. (`ReplyRequest.SaveDTO`, `ReplyResponse.DetailDTO`)
+  - 댓글 비즈니스 로직을 `ReplyService`에 구현했다.
+  - API 댓글 작성 엔드포인트를 추가했다. (`POST /api/boards/{boardId}/replies`)
+  - 화면 댓글 작성 엔드포인트를 추가했다. (`POST /boards/{id}/replies`)
+  - 게시글 상세 조회 시 댓글과 댓글 작성자까지 fetch join으로 조회하도록 리팩토링했다.
+  - 상세 페이지에 댓글 목록 렌더링과 댓글 등록 폼을 추가했다.
+  - task 8번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트:
+    - `GET /boards/4`에서 기존 댓글(`comment1`, `comment2`, `comment3`) 노출 확인
+    - `POST /boards/4/replies`로 `new-comment-agent1` 등록 후 `GET /boards/4`에서 신규 댓글 노출 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 3
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 8번 `게시글에 댓글 기능 추가하기`
+  - `.gem/task1.md` 9번 `댓글 삭제기능 추가하기`
+  - `.gem/task1.md` 10번 `게시글 삭제 및 댓글 삭제에 작성한 id와 동일시 삭제할 권한 추가하기`
+  - `.gem/task1.md` 11번 `mustache로 구현한 홈페이지 기능을 네이버 카페처럼 디자인 변경하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/reply/ReplyResponse.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyRepository.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyService.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyController.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardController.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 댓글 삭제 기능 추가:
+    - API `DELETE /api/replies/{id}` 구현
+    - 화면 `POST /boards/{boardId}/replies/{replyId}/delete` 구현
+  - 삭제 권한 강화:
+    - 게시글 삭제는 작성자 본인만 가능하도록 서비스에서 권한 체크 추가
+    - 댓글 삭제는 작성자 본인만 가능하도록 서비스에서 권한 체크 추가
+  - 성능/조회 보강:
+    - 댓글 삭제 시 작성자/게시글을 fetch join으로 조회하는 Repository 메서드 추가
+  - UI 개편:
+    - 목록/상세 mustache를 네이버 카페 느낌(상단 바, 카드형 리스트, 댓글 패널)으로 리디자인
+  - task 8~11번 체크 완료
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트:
+    - `POST /boards/4/delete` 결과 `403` (타인 게시글 삭제 차단)
+    - `POST /boards/4/replies/{id}/delete` 결과 `403` (타인 댓글 삭제 차단)
+    - `POST /boards/5/replies/4/delete` 결과 `302` 후 댓글 미노출 확인 (본인 댓글 삭제 성공)
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 4
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 12번 `로그인, 회원가입 버튼 만들고 기능 추가하기`
+  - `.gem/task1.md` 13번 `왼쪽 위에 로고를 누르면 목록으로 돌아가는 기능 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/auth/AuthViewController.java`
+  - `src/main/resources/templates/auth/login.mustache`
+  - `src/main/resources/templates/auth/join.mustache`
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 로그인/회원가입 화면 라우팅 컨트롤러 추가:
+    - `GET /login` -> 로그인 페이지
+    - `GET /join` -> 회원가입 페이지
+  - 로그인/회원가입 mustache 페이지 추가:
+    - `/login` 페이지에서 `/login` API 호출 후 토큰(localStorage) 저장 및 목록 이동
+    - `/join` 페이지에서 `/join` API 호출 후 로그인 페이지 이동
+  - 목록/상세 상단에 로그인/회원가입 버튼 추가
+  - 상단 로고를 `/boards` 링크로 변경해 클릭 시 목록 이동 기능 추가
+  - task 12, 13 체크 완료
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트:
+    - `GET /login` 200, `GET /join` 200
+    - 목록 페이지에 로그인/회원가입 버튼 노출 확인
+    - 목록 페이지 로고 링크(`/boards`) 적용 확인
+    - `POST /join` 200, `POST /login` 200, 로그인 토큰 반환 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 5
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 14번 `회원가입할때 중복된 이름이 있을경우 에러 메세지가 나타나게 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/auth/AuthService.java`
+  - `src/main/resources/templates/auth/join.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 회원가입 서비스에서 저장 전에 `유저네임중복체크()`를 수행하도록 추가했다.
+  - 중복 유저네임일 때 `Exception400("동일한 유저네임이 존재합니다")`을 반환하도록 보장했다.
+  - 회원가입 페이지에 인라인 에러 박스를 추가해 실패 메시지를 화면에 직접 노출하도록 변경했다.
+  - task 14번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트:
+    - `POST /join` (username: `ssar`) 결과 `400`
+    - 응답 본문 메시지: `동일한 유저네임이 존재합니다`
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 6
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 15번 `게시글 db를 10개 추가해서 게시글 목록 5개씩 보기로 수정하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/board/BoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardController.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/db/data.sql`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 게시글 목록 조회를 페이지네이션으로 변경했다.
+    - 페이지 크기: 5
+    - 정렬: id 내림차순(최신 글 우선)
+  - 목록 화면(`/`, `/boards`)에서 `page` 파라미터를 받아 이전/다음 페이지 링크를 출력하도록 모델 데이터를 추가했다.
+  - 목록 템플릿에 페이지 네비게이션 UI(이전/다음, 현재 페이지)를 추가했다.
+  - 게시글 시드 데이터를 10개가 되도록 `data.sql`에 `title6`~`title10`을 추가했다.
+  - task 15번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트(UI):
+    - `GET /boards?page=0` 게시글 카드 5개 확인
+    - `GET /boards?page=1` 게시글 카드 5개 확인
+  - 참고:
+    - `/api/boards`는 인증이 필요한 주소라 토큰 없이 호출 시 401이 반환된다.
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 7
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 16번 `자유게시판 -> 글쓰기 게시판으로 변경해주고 이미지게시판을 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `src/main/resources/templates/board/image-list.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 목록 화면의 게시판 명칭을 `자유게시판`에서 `글쓰기 게시판`으로 변경했다.
+  - 이미지게시판 화면을 새로 추가했다. (`GET /image-boards`, `board/image-list.mustache`)
+  - 목록/상세 화면에 `글쓰기 게시판`, `이미지게시판` 탭 메뉴를 추가했다.
+  - task 16번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트:
+    - `/boards`에서 `글쓰기 게시판` 문구 확인
+    - `/boards`에서 이미지게시판 이동 탭 확인
+    - `/image-boards`에서 이미지게시판 페이지 렌더링 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 8
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 17번 `이미지게시판에 글쓰기를 하면 이미지추가하는 설정을 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/_core/config/WebConfig.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoard.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardRepository.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardResponse.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/image-list.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 이미지게시판 업로드 기능을 위해 이미지 게시글 도메인(Entity/Repository/Service/DTO)을 추가했다.
+  - 이미지게시판 글쓰기 폼을 `multipart/form-data` 방식으로 구현했다.
+  - 이미지 파일을 `./upload` 폴더에 저장하고, 저장 경로를 `/upload/**` 정적 리소스로 노출하는 설정을 추가했다.
+  - `POST /image-boards/write` 엔드포인트를 추가해 이미지 글 등록 후 목록으로 리다이렉트하도록 구현했다.
+  - 이미지게시판 목록에서 등록된 이미지 글(제목/내용/이미지)을 렌더링하도록 템플릿을 수정했다.
+  - task 17번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트:
+    - `POST /image-boards/write` 업로드 요청 결과 `302`
+    - `/image-boards`에서 신규 제목 노출 확인
+    - `/image-boards`에서 `/upload/` 이미지 경로 노출 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 9
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 18번 `글쓰기게시판에 글쓰기 기능 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/board/BoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/list.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 글쓰기 게시판 저장 로직을 `BoardService.게시글쓰기()`로 추가했다.
+  - 목록 화면에서 글쓰기 처리 엔드포인트 `POST /boards/write`를 추가했다.
+  - 목록 템플릿에 글쓰기 폼(제목/내용/등록 버튼)을 추가했다.
+  - task 18번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트:
+    - `POST /boards/write` 결과 `302`
+    - 등록 글(`agent18-title2`)이 `/boards?page=2`에서 노출 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 10
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 19번 `이미지게시판에 글을 쓰면 이미지게시판 글 목록 추가하기`
+- 수정 파일:
+  - `.gem/task1.md`
+- 구현 내용:
+  - 코드 확인 결과 이미지 게시판 글쓰기 후 목록 반영 기능이 이미 구현되어 있었다.
+    - `POST /image-boards/write`에서 저장 후 `redirect:/image-boards`
+    - `/image-boards`에서 `imageBoards` 목록 렌더링
+  - task 19번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트:
+    - `POST /image-boards/write` 결과 `302`
+    - `/image-boards`에서 신규 이미지 글 제목 노출 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 11
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 20번 `로그아웃버튼 추가하고 기능 추가하기`
+- 수정 파일:
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `src/main/resources/templates/board/image-list.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 목록/상세/이미지게시판 상단에 로그아웃 버튼을 추가했다.
+  - 로그아웃 버튼 클릭 시 `localStorage`의 `accessToken`을 삭제하고 `/boards`로 이동하도록 기능을 추가했다.
+  - task 20번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 템플릿 검증:
+    - `list.mustache`, `detail.mustache`, `image-list.mustache` 모두 `logoutBtn` 버튼/스크립트 존재 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 12
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 21번 `게시판마다 글쓰기 버튼을 따로 추가하고 기능추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/image-list.mustache`
+  - `src/main/resources/templates/board/write-form.mustache`
+  - `src/main/resources/templates/board/image-write-form.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 글쓰기 게시판과 이미지게시판에 각각 전용 글쓰기 버튼을 추가했다.
+  - 글쓰기 게시판 전용 페이지를 추가했다. (`GET /boards/write-form`)
+  - 이미지게시판 전용 페이지를 추가했다. (`GET /image-boards/write-form`)
+  - 기존 인라인 글쓰기 폼을 게시판별 전용 글쓰기 페이지 방식으로 분리했다.
+  - task 21번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트:
+    - `/boards`에서 `/boards/write-form` 버튼 노출 확인
+    - `/image-boards`에서 `/image-boards/write-form` 버튼 노출 확인
+    - `/boards/write-form` 200, `/image-boards/write-form` 200 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 13
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 22번 `왼쪽 우리동네 카페 옆에 내 아이디 표시하기 로그인 되어있으면 아이디 이름 표시, 비로그인이면 사용자라고 표시하기`
+- 수정 파일:
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `src/main/resources/templates/board/image-list.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 목록/상세/이미지게시판 상단 로고 옆에 사용자 표시 영역(`currentUserName`)을 추가했다.
+  - `localStorage`의 `accessToken`을 읽어 JWT payload를 파싱하고, 로그인 시 `sub(username)`를 사용자명으로 표시하도록 구현했다.
+  - 토큰이 없거나 파싱 실패 시 기본값 `사용자`를 표시하도록 구현했다.
+  - task 22번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 템플릿 검증:
+    - `list.mustache`, `detail.mustache`, `image-list.mustache`에 `currentUserName`/`parseJwt` 스크립트 반영 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 14
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 23번 `로그아웃을 할 경우 로그인 일 경우 로그아웃하기, 비로그인시 로그아웃을 할 경우 에러창 띄우기`
+- 수정 파일:
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `src/main/resources/templates/board/image-list.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 로그아웃 버튼 클릭 시 `accessToken` 존재 여부를 먼저 검사하도록 수정했다.
+  - 비로그인 상태(토큰 없음)에서는 `비로그인 상태입니다. 먼저 로그인해주세요.` 에러창을 띄우고 중단한다.
+  - 로그인 상태(토큰 있음)에서만 토큰 삭제 + 로그아웃 완료 메시지 + 목록 이동을 수행하도록 분기 처리했다.
+  - task 23번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 템플릿 검증:
+    - `list.mustache`, `detail.mustache`, `image-list.mustache`에 비로그인 에러 메시지 분기 로직 반영 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 15
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 24번 `이미지게시판에 등록된 글에 대한 상세보기 기능 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardResponse.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/image-list.mustache`
+  - `src/main/resources/templates/board/image-detail.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 이미지게시글 상세조회 DTO(`ImageBoardResponse.DetailDTO`)를 추가했다.
+  - 이미지게시글 단건 조회 서비스(`ImageBoardService.상세보기`)를 추가했다.
+  - 이미지게시글 상세 라우트(`GET /image-boards/{id}`)를 추가했다.
+  - 이미지게시판 목록에서 제목 클릭 시 상세 페이지로 이동하도록 링크를 추가했다.
+  - 이미지게시판 상세 템플릿(`image-detail.mustache`)을 추가했다.
+  - task 24번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+  - 수동 테스트:
+    - `/image-boards/{id}` 상세 라우트 응답 `200`
+    - 상세 페이지에서 등록한 이미지 글 제목 노출 확인
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 16
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 25번 `댓글기능에 이미지 파일 넣는 기능을 추가하기 댓글에 이미지를 넣을시 크기는 댓글창 두개의 세로사이즈를 넘지않게 정사각형 모양으로 나오게하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/reply/Reply.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyResponse.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyService.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyController.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 댓글 엔티티에 이미지 URL 필드(`imageUrl`)를 추가했다.
+  - 댓글 작성 서비스에 선택적 이미지 업로드 로직을 추가했다.
+  - 댓글 이미지 파일은 `./upload` 폴더에 저장하고 `/upload/**` URL로 접근하도록 저장했다.
+  - 게시글 상세 댓글 폼을 `multipart/form-data`로 변경하고 이미지 파일 입력칸을 추가했다.
+  - 댓글 이미지가 있을 때 상세 화면에서 정사각형(`96x96`, `object-fit: cover`)으로 렌더링하도록 구현했다.
+  - 업로드 입력칸 아래에 `20MB 이하 이미지 파일만 업로드` 안내 문구를 추가했다.
+  - task 25번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 17
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 26번 `이미지게시판의 상세보기 기능에 댓글기능 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoard.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardRepository.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardReply.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardReplyRepository.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardReplyService.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardResponse.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/image-detail.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 이미지게시글 전용 댓글 엔티티/리포지토리/서비스를 추가했다.
+  - 이미지게시글 상세 조회 시 댓글과 댓글 작성자를 함께 조회하도록 fetch join 쿼리를 추가했다.
+  - 이미지게시글 상세 DTO에 댓글 목록(`replies`)을 포함하도록 확장했다.
+  - 이미지게시글 상세 화면에 댓글 목록 렌더링과 댓글 작성 폼을 추가했다.
+  - 이미지게시글 상세 화면 댓글 등록 라우트(`POST /image-boards/{id}/replies`)를 추가했다.
+  - task 26번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 18
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 27번 `글마다 좋아요, 싫어요 기능 추가하기, 글 목록에 글 오른쪽에 좋아요, 싫어요 갯수 표시하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/board/Board.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardResponse.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardDetailDTO.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardController.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 게시글 엔티티에 좋아요/싫어요 카운트 필드(`likeCount`, `dislikeCount`)와 증가 메서드를 추가했다.
+  - 목록/상세 DTO에 좋아요/싫어요 카운트를 포함했다.
+  - 서비스에 게시글 좋아요/싫어요 증가 로직을 추가했다.
+  - API 라우트 `POST /api/boards/{id}/like`, `POST /api/boards/{id}/dislike`를 추가했다.
+  - 화면 라우트 `POST /boards/{id}/like`, `POST /boards/{id}/dislike`를 추가했다.
+  - 상세 화면에 좋아요/싫어요 버튼과 현재 카운트를 추가했다.
+  - 목록 화면 우측에 게시글별 좋아요/싫어요 카운트 표시 영역을 추가했다.
+  - task 27번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 19
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 28번 `좋아요, 싫어요 기능을 계정하나의 글 하나당 좋아요 1번 and 싫어요 1번 제한하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/board/BoardReaction.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardReactionRepository.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardController.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 게시글 반응 이력 엔티티(`BoardReaction`)와 저장소를 추가했다.
+  - 같은 게시글/같은 유저/같은 반응타입(`LIKE`, `DISLIKE`) 조합에 대해 unique 제약을 적용했다.
+  - 좋아요/싫어요 처리 시 기존 반응 이력을 조회해 이미 누른 경우 `Exception400`으로 차단하도록 구현했다.
+  - API 좋아요/싫어요 라우트에서 인증 유저 ID로 처리하도록 변경했다.
+  - 화면 라우트는 기존 동작과 맞추어 기본 유저(1번) 기준으로 중복 제한이 적용되도록 변경했다.
+  - task 28번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 20
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 29번 `이미지게시판 이름을 이미지 게시판으로 바꿔주고, 이미지 게시판의 글목록도 글쓰기 게시판 글 목록처럼 바꾸고 좋아요, 싫어요 기능을 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoard.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardResponse.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/image-list.mustache`
+  - `src/main/resources/templates/board/image-detail.mustache`
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `src/main/resources/templates/board/image-write-form.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 이미지 게시글 엔티티에 좋아요/싫어요 카운트 필드와 증가 메서드를 추가했다.
+  - 이미지 게시글 목록/상세 DTO에 좋아요/싫어요 카운트를 포함했다.
+  - 이미지 게시글 서비스에 좋아요/싫어요 증가 기능을 추가했다.
+  - 이미지 게시글 상세 화면 라우트에 좋아요/싫어요 처리 엔드포인트를 추가했다.
+  - 이미지 게시판 목록 화면을 글쓰기 게시판 목록 구조와 유사한 카드/우측 카운트 레이아웃으로 개편했다.
+  - 화면 텍스트 `이미지게시판`을 `이미지 게시판`으로 통일했다.
+  - task 29번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 21
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 30번 `댓글마다 글의 좋아요, 싫어요 기능을 댓글에도 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/reply/Reply.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyResponse.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyRepository.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyService.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyController.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardReply.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardReplyRepository.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardReplyService.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardResponse.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `src/main/resources/templates/board/image-detail.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 일반 게시글 댓글/이미지 게시글 댓글 엔티티에 좋아요/싫어요 카운트 필드를 추가했다.
+  - 댓글 DTO에 좋아요/싫어요 카운트를 포함해 화면에서 렌더링하도록 확장했다.
+  - 일반 댓글/이미지 댓글에 대해 좋아요/싫어요 증가 서비스 로직을 추가했다.
+  - 댓글이 해당 게시글에 속하는지 검증하는 조회 로직을 Repository/Service에 추가했다.
+  - 화면 라우트에 댓글 좋아요/싫어요 엔드포인트를 추가했다.
+  - 게시글 상세/이미지 게시글 상세 템플릿의 댓글 영역에 좋아요/싫어요 버튼과 카운트를 추가했다.
+  - task 30번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 22
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 31번 `댓글마다 좋아요, 싫어요 기능을 계정하나의 댓글 하나당 좋아요 1번 and 싫어요 1번 제한하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/reply/ReplyReaction.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyReactionRepository.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyService.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyController.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardReplyReaction.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardReplyReactionRepository.java`
+  - `src/main/java/com/metacoding/springv2/imageboard/ImageBoardReplyService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 일반 댓글/이미지 댓글 각각에 반응 이력 엔티티와 저장소를 추가했다.
+  - `댓글 + 유저 + 반응타입` 조합에 unique 제약을 적용해 계정별 중복 반응을 차단했다.
+  - 댓글 좋아요/싫어요 서비스에 중복 검사 로직을 추가하고, 중복 시 `Exception400`을 발생시키도록 구현했다.
+  - API 댓글 좋아요/싫어요는 인증 유저 ID로 처리하도록 변경했다.
+  - 화면 라우트 댓글 좋아요/싫어요도 유저 ID 파라미터를 넘기도록 반영했다(기존 화면 정책상 기본 유저 1번 사용).
+  - task 31번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 23
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 32번 `베스트 게시글, 전체글 목록 추가하기 베스트 게시글은 전체 게시글 중 좋아요 +1 게시글 -1 의 점수를 두고 제일 높은 점수글 하나만 나오게 추가하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/board/BoardResponse.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/list.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 목록 DTO에 게시글 점수(`score = likeCount - dislikeCount`) 필드를 추가했다.
+  - 서비스에 베스트 게시글 1건 조회 로직과 전체글 목록 조회 로직을 추가했다.
+  - 목록 화면 모델에 `bestBoard`, `allBoards`를 추가했다.
+  - 목록 템플릿에 베스트 게시글 카드 섹션과 전체글 목록 섹션을 추가했다.
+  - 기존 페이지네이션 목록은 별도 `페이지 목록` 섹션으로 유지했다.
+  - task 32번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 24
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 33번 `오류가 발생할시 팝업창으로 오류문구 출력후 /boards로 보내기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/_core/handler/GlobalExceptionHandler.java`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 글로벌 예외 처리기에 요청 경로 기반 분기(`isWebRequest`)를 추가했다.
+  - 웹 요청(`/api/**` 제외)에서 예외가 발생하면 JSON 대신 `alert` 후 `/boards`로 이동하는 HTML 스크립트를 반환하도록 변경했다.
+  - API 요청(`/api/**`)은 기존처럼 JSON 에러 응답(`Resp.fail`)을 유지했다.
+  - 업로드 용량 초과/권한/인증/미존재/알수없는 예외 모두 웹 요청일 때 팝업+리다이렉트가 동작하도록 반영했다.
+  - task 33번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 25
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 34번 `ADMIN으로 로그인시 게시글, 댓글삭제에 대한 기능을 모두 허용 및 ADMIN의 게시글삭제, 댓글삭제는 빨간색으로 표시 사용자 이름옆에 (ADMIN) 추가`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/board/BoardService.java`
+  - `src/main/java/com/metacoding/springv2/reply/ReplyService.java`
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `src/main/resources/templates/board/image-list.mustache`
+  - `src/main/resources/templates/board/image-detail.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 게시글 삭제/댓글 삭제 권한 로직을 `작성자 본인 또는 ADMIN`으로 확장했다.
+  - 목록/상세/이미지목록 상단 사용자명 표시에 ADMIN 로그인 시 `(ADMIN)` 라벨을 추가했다.
+  - ADMIN 로그인 시 삭제 버튼 스타일이 빨간색으로 표시되도록 템플릿/스크립트를 반영했다.
+  - 이미지 게시글 상세 삭제 버튼에도 ADMIN 빨간색 표시를 적용했다.
+  - task 34번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 26
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 35번 `로그인시 로그인 버튼 안보이게 하기`
+- 수정 파일:
+  - `src/main/resources/templates/board/list.mustache`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `src/main/resources/templates/board/image-list.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 목록/상세/이미지 목록 상단의 로그인 링크에 `id="loginLink"`를 부여했다.
+  - 로그인 상태(JWT 토큰 존재, payload 파싱 성공)일 때 `loginLink`를 숨기도록 스크립트를 추가했다.
+  - task 35번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.
+
+## 작업 순서 27
+- 작업 일시: 2026-02-23
+- 대상 task:
+  - `.gem/task1.md` 36번 `게시글 삭제 및 수정버튼 작성자만 보이게 하기`
+- 수정 파일:
+  - `src/main/java/com/metacoding/springv2/board/BoardService.java`
+  - `src/main/java/com/metacoding/springv2/board/BoardViewController.java`
+  - `src/main/resources/templates/board/detail.mustache`
+  - `src/main/resources/templates/board/edit-form.mustache`
+  - `.gem/task1.md`
+- 구현 내용:
+  - 게시글 수정 서비스(`게시글수정하기`)를 추가하고 작성자 본인만 수정 가능하도록 권한 체크를 구현했다.
+  - 게시글 수정 페이지/처리 라우트(`GET /boards/{id}/edit-form`, `POST /boards/{id}/update`)를 추가했다.
+  - 상세 페이지에 `게시글 수정` 버튼을 추가하고, 삭제 버튼과 함께 `author-only` 클래스로 기본 숨김 처리했다.
+  - 상세 페이지 스크립트에서 JWT `id`와 게시글 작성자 `userId`가 같을 때만 수정/삭제 버튼을 노출하도록 반영했다.
+  - task 36번 체크 완료.
+- 검증 결과:
+  - `.\gradlew.bat compileJava` 성공
+- 참고:
+  - 가이드에 적힌 `.gem/rule1.md`는 실제 경로에 없어 기존 규칙 파일 `.gem/rules1.md` 기준으로 작업했다.

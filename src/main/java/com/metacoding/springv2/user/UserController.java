@@ -17,7 +17,7 @@ public class UserController {
 
     // REST API 규칙상 GET 요청은 리소스 조회를 나타내며, URL에 자원의 식별자를 포함해야 한다. (ex. /api/users/{id})
     @GetMapping("/api/users/{id}")
-    public ResponseEntity<?> 유저정보보기(@PathVariable Integer id) {
+    public ResponseEntity<?> 유저정보보기(@PathVariable("id") Integer id) {
         // 1. UserService에서 비지니스 로직을 호출한다.
         UserResponse.DetailDTO respDTO = userService.회원정보보기(id);
         

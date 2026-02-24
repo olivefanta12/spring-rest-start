@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>글쓰기 게시판 - 수정</title>
+  <style>
+    :root {
+      --naver-green: #03c75a;
+      --line: #e5e7eb;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      background: var(--bg);
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 22px auto;
+      padding: 0 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+    button, a {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-weight: 700;
+      text-decoration: none;
+      color: #0f172a;
+      display: inline-block;
+    }
+    .primary {
+      border-color: var(--naver-green);
+      background: var(--naver-green);
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    {{#board}}
+    <section class="card">
+      <h2>게시글 수정</h2>
+      <form action="/boards/{{id}}/update" method="post">
+        <input type="text" name="title" value="{{title}}" required />
+        <textarea name="content" rows="6" required>{{content}}</textarea>
+        <button class="primary" type="submit">수정 완료</button>
+      </form>
+      <a href="/boards/{{id}}">상세로</a>
+    </section>
+    {{/board}}
+  </main>
+</body>
+</html>

@@ -17,6 +17,12 @@ public class Reply {
     private Integer id;
     @Column(length = 100, nullable = false)
     private String comment;
+    @Column(length = 300)
+    private String imageUrl;
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int likeCount;
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int dislikeCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -27,10 +33,22 @@ public class Reply {
     @CreationTimestamp
     private Timestamp createdAt;
 
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void increaseDislikeCount() {
+        this.dislikeCount++;
+    }
+
     @Builder
-    public Reply(Integer id, String comment, User user, Board board, Timestamp createdAt) {
+    public Reply(Integer id, String comment, String imageUrl, int likeCount, int dislikeCount, User user, Board board,
+            Timestamp createdAt) {
         this.id = id;
         this.comment = comment;
+        this.imageUrl = imageUrl;
+        this.likeCount = likeCount;
+        this.dislikeCount = dislikeCount;
         this.user = user;
         this.board = board;
         this.createdAt = createdAt;

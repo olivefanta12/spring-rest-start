@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.metacoding.springv2.user.User;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 public class JwtProvider {
@@ -17,6 +18,15 @@ public class JwtProvider {
         if (jwt != null && jwt.startsWith(JwtUtil.TOKEN_PREFIX)) {
             jwt = jwt.replace("Bearer ", "");
             return jwt;
+        }
+
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }

@@ -36,6 +36,9 @@ public class AuthService {
 
     @Transactional
     public AuthResponse.DTO 회원가입(JoinDTO reqDTO) {
+        // 회원가입 시 동일한 유저네임이 있으면 즉시 예외를 발생시켜 화면에 메시지를 보여준다.
+        유저네임중복체크(reqDTO.getUsername());
+
         // 1. password hash하기
         String encPassword = bCryptPasswordEncoder.encode(reqDTO.getPassword());
         User user = User.builder()

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이미지 게시판 - 상세보기</title>
+  <style>
+    :root {
+      --naver-green: #03c75a;
+      --line: #e5e7eb;
+      --text: #202936;
+      --muted: #667085;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .top {
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--naver-green);
+      text-decoration: none;
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 22px auto;
+      padding: 0 14px;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .content {
+      color: var(--muted);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    .image {
+      width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .go-list {
+      display: inline-block;
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 12px;
+      text-decoration: none;
+      color: #0f172a;
+      font-weight: 700;
+      background: #fff;
+    }
+    .reply-box {
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+    .reply-item {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: #fcfffd;
+      font-size: 14px;
+      color: #334155;
+    }
+    .reply-input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+    .reply-vote {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .primary {
+      border: 1px solid var(--naver-green);
+      background: var(--naver-green);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .vote-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0 12px;
+    }
+    .vote-count {
+      color: #475569;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .admin-delete {
+      border-color: #ef4444 !important;
+      color: #ef4444 !important;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <a class="brand" href="/boards">우리동네 카페</a>
+    <a class="go-list" href="/image-boards">이미지 게시판 목록</a>
+  </div>
+  <main class="wrap">
+    {{#imageBoard}}
+    <section class="panel">
+      <div class="title">{{title}}</div>
+      <div class="content">{{content}}</div>
+      <img class="image" src="{{imageUrl}}" alt="{{title}}" />
+      <div class="vote-box">
+        <form action="/image-boards/{{id}}/like" method="post">
+          <button type="submit">좋아요</button>
+        </form>
+        <span class="vote-count">{{likeCount}}</span>
+        <form action="/image-boards/{{id}}/dislike" method="post">
+          <button type="submit">싫어요</button>
+        </form>
+        <span class="vote-count">{{dislikeCount}}</span>
+        <form action="/image-boards/{{id}}/delete" method="post">
+          <button class="delete-btn" type="submit">게시글 삭제</button>
+        </form>
+      </div>
+      <section class="reply-box">
+        <h3>댓글</h3>
+        {{#replies}}
+        <div class="reply-item">
+          {{comment}} ({{username}})
+          <div class="reply-vote">
+            <form action="/image-boards/{{imageBoardId}}/replies/{{id}}/like" method="post">
+              <button type="submit">좋아요</button>
+            </form>
+            <span class="vote-count">{{likeCount}}</span>
+            <form action="/image-boards/{{imageBoardId}}/replies/{{id}}/dislike" method="post">
+              <button type="submit">싫어요</button>
+            </form>
+            <span class="vote-count">{{dislikeCount}}</span>
+            <form action="/image-boards/{{imageBoardId}}/replies/{{id}}/delete" method="post">
+              <button class="delete-btn" type="submit">댓글 삭제</button>
+            </form>
+          </div>
+        </div>
+        {{/replies}}
+        {{^replies}}
+        <div class="reply-item">댓글이 없습니다.</div>
+        {{/replies}}
+        <form action="/image-boards/{{id}}/replies" method="post">
+          <input class="reply-input" type="text" name="comment" placeholder="댓글을 입력하세요" />
+          <button class="primary" type="submit">댓글쓰기</button>
+        </form>
+      </section>
+      <a class="go-list" href="/image-boards">목록으로</a>
+    </section>
+    {{/imageBoard}}
+  </main>
+  <script>
+    function parseJwt(token) {
+      try {
+        const payload = token.split(".")[1];
+        const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+        return JSON.parse(atob(normalized));
+      } catch (e) {
+        return null;
+      }
+    }
+
+    const token = sessionStorage.getItem("accessToken");
+    if (token) {
+      const payload = parseJwt(token);
+      if (payload && payload.roles && payload.roles.indexOf("ADMIN") !== -1) {
+        document.querySelectorAll(".delete-btn").forEach(function (el) {
+          el.classList.add("admin-delete");
+        });
+      }
+    }
+  </script>
+</body>
+</html>

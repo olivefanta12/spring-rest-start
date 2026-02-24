@@ -18,7 +18,7 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/check-username")
-    public ResponseEntity<?> 유저네임중복체크(@RequestParam String username) {
+    public ResponseEntity<?> 유저네임중복체크(@RequestParam("username") String username) {
         authService.유저네임중복체크(username);
         return Resp.ok("사용가능한 유저네임입니다");
     }

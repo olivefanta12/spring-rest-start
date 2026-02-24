@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우리동네 카페 - 게시글 상세</title>
+  <style>
+    :root {
+      --naver-green: #03c75a;
+      --line: #e5e7eb;
+      --text: #202936;
+      --muted: #667085;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .top {
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      padding: 14px 18px;
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .left-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--naver-green);
+      text-decoration: none;
+    }
+    .current-user {
+      color: #475569;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .auth-menu {
+      display: flex;
+      gap: 8px;
+    }
+    .auth-menu a, .auth-menu button {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 6px 10px;
+      text-decoration: none;
+      color: #0f172a;
+      font-size: 13px;
+      font-weight: 700;
+      background: #fff;
+      cursor: pointer;
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 22px auto;
+      padding: 0 14px;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 26px;
+    }
+    .meta {
+      color: var(--muted);
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+    .content {
+      line-height: 1.75;
+      font-size: 15px;
+    }
+    .reply-box h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+    .reply-item {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: #fcfffd;
+      font-size: 14px;
+      color: #334155;
+    }
+    .reply-image {
+      width: 96px;
+      height: 96px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin-top: 8px;
+      display: block;
+    }
+    .file-guide {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+      margin-bottom: 8px;
+    }
+    .reply-vote {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      margin-bottom: 6px;
+    }
+    .vote-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .vote-count {
+      color: #475569;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .toolbar {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+    button, .go-list {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      color: #0f172a;
+      text-decoration: none;
+    }
+    .primary {
+      background: var(--naver-green);
+      border-color: var(--naver-green);
+      color: #fff;
+    }
+    .admin-delete {
+      border-color: #ef4444 !important;
+      color: #ef4444 !important;
+      font-weight: 800;
+    }
+    .author-only {
+      display: none;
+    }
+    .tab-row {
+      display: flex;
+      gap: 8px;
+      margin: 0 auto 12px;
+      max-width: 920px;
+      padding: 0 14px;
+    }
+    .tab {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 6px 10px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      background: #fff;
+    }
+    .tab.active {
+      background: var(--naver-green);
+      border-color: var(--naver-green);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div class="left-box">
+      <a class="brand" href="/boards">우리동네 카페</a>
+      <span id="currentUserName" class="current-user">사용자</span>
+    </div>
+    <div class="auth-menu">
+      <a id="loginLink" href="/login">로그인</a>
+      <a href="/join">회원가입</a>
+      <button id="logoutBtn" type="button">로그아웃</button>
+    </div>
+  </div>
+  <div class="tab-row">
+    <a class="tab active" href="/boards">글쓰기 게시판</a>
+    <a class="tab" href="/image-boards">이미지 게시판</a>
+  </div>
+  <main class="wrap">
+  {{#board}}
+  <section id="boardPanel" class="panel" data-board-user-id="{{userId}}">
+    <h1>{{title}}</h1>
+    <div class="meta">작성자 {{username}} · 회원번호 {{userId}}</div>
+    <div class="content">{{content}}</div>
+    <div class="vote-box">
+      <form action="/boards/{{id}}/like" method="post">
+        <button type="submit">좋아요</button>
+      </form>
+      <span class="vote-count">{{likeCount}}</span>
+      <form action="/boards/{{id}}/dislike" method="post">
+        <button type="submit">싫어요</button>
+      </form>
+      <span class="vote-count">{{dislikeCount}}</span>
+    </div>
+    <div class="toolbar">
+      <a class="go-list author-only" href="/boards/{{id}}/edit-form">게시글 수정</a>
+      <form class="author-only" action="/boards/{{id}}/delete" method="post">
+        <button class="delete-btn" type="submit">게시글 삭제</button>
+      </form>
+      <a class="go-list" href="/boards">목록으로 이동</a>
+    </div>
+  </section>
+
+  <section class="panel reply-box">
+      <h3>댓글</h3>
+      {{#replies}}
+      <div class="reply-item">
+        {{comment}} ({{username}})
+        {{#imageUrl}}
+        <img class="reply-image" src="{{imageUrl}}" alt="댓글 이미지" />
+        {{/imageUrl}}
+        <div class="reply-vote">
+          <form action="/boards/{{boardId}}/replies/{{id}}/like" method="post">
+            <button type="submit">좋아요</button>
+          </form>
+          <span class="vote-count">{{likeCount}}</span>
+          <form action="/boards/{{boardId}}/replies/{{id}}/dislike" method="post">
+            <button type="submit">싫어요</button>
+          </form>
+          <span class="vote-count">{{dislikeCount}}</span>
+        </div>
+        <div class="toolbar">
+          <form action="/boards/{{boardId}}/replies/{{id}}/delete" method="post">
+            <button class="delete-btn" type="submit">댓글 삭제</button>
+          </form>
+        </div>
+      </div>
+      {{/replies}}
+      {{^replies}}
+      <div class="reply-item">댓글이 없습니다.</div>
+      {{/replies}}
+      <form action="/boards/{{id}}/replies" method="post" enctype="multipart/form-data" style="margin-top:10px;">
+        <input type="text" name="comment" placeholder="댓글을 입력하세요" />
+        <input type="file" name="imageFile" accept="image/*" />
+        <div class="file-guide">20MB 이하 이미지 파일만 업로드할 수 있습니다.</div>
+        <button class="primary" type="submit">댓글쓰기</button>
+      </form>
+    </section>
+  {{/board}}
+  </main>
+  <script>
+    function parseJwt(token) {
+      try {
+        const payload = token.split(".")[1];
+        const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+        return JSON.parse(atob(normalized));
+      } catch (e) {
+        return null;
+      }
+    }
+
+    const token = sessionStorage.getItem("accessToken");
+    if (token) {
+      const payload = parseJwt(token);
+      if (payload && payload.sub) {
+        const isAdmin = payload.roles && payload.roles.indexOf("ADMIN") !== -1;
+        document.getElementById("currentUserName").textContent = isAdmin ? payload.sub + " (ADMIN)" : payload.sub;
+        document.getElementById("loginLink").style.display = "none";
+        const boardUserId = parseInt(document.getElementById("boardPanel").dataset.boardUserId, 10);
+        if (payload.id === boardUserId) {
+          document.querySelectorAll(".author-only").forEach(function (el) {
+            el.style.display = "inline-block";
+          });
+        }
+        if (isAdmin) {
+          document.querySelectorAll(".delete-btn").forEach(function (el) {
+            el.classList.add("admin-delete");
+          });
+        }
+      }
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+      const token = sessionStorage.getItem("accessToken");
+      if (!token) {
+        alert("비로그인 상태입니다. 먼저 로그인해주세요.");
+        return;
+      }
+
+      // 로그인 상태에서만 토큰을 삭제하고 로그아웃을 처리한다.
+      sessionStorage.removeItem("accessToken");
+      document.cookie = "accessToken=; path=/; Max-Age=0";
+      alert("로그아웃 되었습니다.");
+      location.href = "/boards";
+    });
+  </script>
+</body>
+</html>

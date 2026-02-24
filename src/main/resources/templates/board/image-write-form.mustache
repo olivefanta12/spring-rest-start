@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이미지 게시판 - 글쓰기</title>
+  <style>
+    :root {
+      --naver-green: #03c75a;
+      --line: #e5e7eb;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      background: var(--bg);
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 22px auto;
+      padding: 0 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+    .guide {
+      margin-top: 8px;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    button, a {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-weight: 700;
+      text-decoration: none;
+      color: #0f172a;
+      display: inline-block;
+    }
+    .primary {
+      border-color: var(--naver-green);
+      background: var(--naver-green);
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <h2>이미지 게시판 글쓰기</h2>
+      <form action="/image-boards/write" method="post" enctype="multipart/form-data">
+        <input type="text" name="title" placeholder="제목" required />
+        <textarea name="content" rows="6" placeholder="내용" required></textarea>
+        <input type="file" name="imageFile" accept="image/*" required />
+        <div class="guide">20MB 이하 파일만 업로드 가능합니다.</div>
+        <button class="primary" type="submit">등록</button>
+      </form>
+      <a href="/image-boards">목록으로</a>
+    </section>
+  </main>
+</body>
+</html>

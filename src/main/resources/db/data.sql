@@ -6,6 +6,11 @@ insert into board_tb (title, content, user_id,created_at) values ('title2', 'con
 insert into board_tb (title, content, user_id,created_at) values ('title3', 'content3', 1,now());
 insert into board_tb (title, content, user_id,created_at) values ('title4', 'content4', 2,now());
 insert into board_tb (title, content, user_id,created_at) values ('title5', 'content5', 2,now());
+insert into board_tb (title, content, user_id,created_at) values ('title6', 'content6', 1,now());
+insert into board_tb (title, content, user_id,created_at) values ('title7', 'content7', 1,now());
+insert into board_tb (title, content, user_id,created_at) values ('title8', 'content8', 1,now());
+insert into board_tb (title, content, user_id,created_at) values ('title9', 'content9', 2,now());
+insert into board_tb (title, content, user_id,created_at) values ('title10', 'content10', 2,now());
 
 insert into reply_tb (comment, board_id, user_id,created_at) values ('comment1', 4, 2,now());
 insert into reply_tb (comment, board_id, user_id,created_at) values ('comment2', 4, 2,now());
